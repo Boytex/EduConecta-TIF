@@ -1,0 +1,93 @@
+@startuml ' Ejemplo de estructura básica UML skinparam classAttributeIconSize 0
+
+class Persona { - id : int - nombre : String - apellido : String - dni : String }
+
+class Alumno { - legajo : String }
+
+class Profesor { - titulo : String }
+
+// === TABLAS PRINCIPALES ===
+
+Table Usuario { id long [pk] username varchar passwordHash varchar rol varchar }
+
+Table Persona { id long [pk] nombre varchar apellido varchar dni varchar fechaNacimiento date }
+
+Table Alumno { id long [pk] legajo varchar }
+
+Table Profesor { id long [pk] titulo varchar }
+
+Table Curso { id long [pk] nombre varchar descripcion varchar cupo int }
+
+Table Inscripcion { id long [pk] alumno_id long curso_id long fechaInscripcion date estado varchar }
+
+// === RELACIONES ===
+
+Ref: Usuario.id > Persona.id Ref: Alumno.id > Persona.id Ref: Profesor.id > Persona.id
+
+Ref: Inscripcion.alumno_id > Alumno.id Ref: Inscripcion.curso_id > Curso.id
+
+Ref: Curso.id > Profesor.id
+
+Table persona { id bigint [pk] nombre varchar apellido varchar dni varchar fecha_nac date }
+
+Table usuario { id bigint [pk] username varchar [unique] password_hash varchar rol varchar persona_id bigint }
+
+Table profesor { id bigint [pk] titulo varchar persona_id bigint }
+
+Table alumno { id bigint [pk] legajo varchar [unique] persona_id bigint }
+
+Table curso { id bigint [pk] nombre varchar descripcion varchar cupo int profesor_id bigint }
+
+Table inscripcion { id bigint [pk] alumno_id bigint curso_id bigint fecha_inscripcion date estado varchar }
+
+Ref: usuario.persona_id > persona.id Ref: profesor.persona_id > persona.id Ref: alumno.persona_id > persona.id
+
+Ref: curso.profesor_id > profesor.id
+
+Ref: inscripcion.alumno_id > alumno.id Ref: inscripcion.curso_id > curso.id
+
+class Curso { - idCurso : int - nombreCurso : String }
+
+Persona <|-- Alumno Persona <|-- Profesor Profesor --> Curso : dicta
+
+@enduml
+
+@startuml !pragma layout smetana
+
+entity "Persona" as persona { * id : int nombre : varchar apellido : varchar dni : varchar }
+
+entity "Alumno" as alumno { * idAlumno : int legajo : varchar }
+
+entity "Profesor" as profesor { * idProfesor : int titulo : varchar }
+
+entity "Curso" as curso { * idCurso : int nombreCurso : varchar }
+
+persona ||--o{ alumno persona ||--o{ profesor profesor ||--o{ curso : dicta
+
+@enduml
+
+CREATE TABLE Persona ( id INT AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(255) NOT NULL, apellido VARCHAR(255) NOT NULL, dni VARCHAR(50) NOT NULL );
+
+CREATE TABLE Alumno ( idAlumno INT AUTO_INCREMENT PRIMARY KEY, legajo VARCHAR(100), persona_id INT, FOREIGN KEY (persona_id) REFERENCES Persona(id) );
+
+CREATE TABLE Profesor ( idProfesor INT AUTO_INCREMENT PRIMARY KEY, titulo VARCHAR(255), persona_id INT, FOREIGN KEY (persona_id) REFERENCES Persona(id) );
+
+CREATE TABLE Curso ( idCurso INT AUTO_INCREMENT PRIMARY KEY, nombreCurso VARCHAR(255) NOT NULL, profesor_id INT, FOREIGN KEY (profesor_id) REFERENCES Profesor(id) );
+
+Table persona { id bigint [pk, increment] nombre varchar [not null] apellido varchar [not null] dni varchar fecha_nac date }
+
+Table usuario { id bigint [pk, increment] username varchar [not null, unique] password_hash varchar [not null] rol varchar [not null] persona_id bigint [not null] }
+
+Table alumno { id bigint [pk, increment] legajo varchar [not null, unique] persona_id bigint [not null] }
+
+Table profesor { id bigint [pk, increment] titulo varchar persona_id bigint [not null] }
+
+Table curso { id bigint [pk, increment] nombre varchar [not null] descripcion varchar cupo int profesor_id bigint }
+
+Table inscripcion { id bigint [pk, increment] alumno_id bigint [not null] curso_id bigint [not null] fecha_inscripcion date estado varchar }
+
+Ref: usuario.persona_id > persona.id Ref: alumno.persona_id > persona.id Ref: profesor.persona_id > persona.id
+
+Ref: curso.profesor_id > profesor.id
+
+Ref: inscripcion.alumno_id > alumno.id Ref: inscripcion.curso_id > curso.id
